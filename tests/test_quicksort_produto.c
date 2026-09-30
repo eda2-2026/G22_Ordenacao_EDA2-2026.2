@@ -68,6 +68,18 @@ int main(void) {
     if (ok) printf("  [ok]     desempate por id (avaliacao 4.5)\n");
     else { falhas++; printf("  [FALHOU] desempate por id\n"); }
 
+    total++;
+    memcpy(v, base, sizeof base);
+    quicksort(v, n, cmp_avaliacao_desc);
+    int ok2 = 1, ultimo2 = 1000000;
+    for (int i = 0; i < n; i++)
+        if (v[i].avaliacao == 4.5f) {
+            if (v[i].id > ultimo2) ok2 = 0;
+            ultimo2 = v[i].id;
+        }
+    if (ok2) printf("  [ok]     desempate por id decrescente (avaliacao 4.5, desc)\n");
+    else { falhas++; printf("  [FALHOU] desempate por id decrescente\n"); }
+
     printf("\n== Resumo: %d/%d passaram ==\n", total - falhas, total);
     if (falhas > 0) { printf("RESULTADO: FALHOU (%d com erro)\n", falhas); return 1; }
     printf("RESULTADO: SUCESSO\n");
