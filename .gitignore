@@ -1,0 +1,17 @@
+# Executáveis
+ranking
+gerador
+/test_*
+*.exe
+
+# Objetos
+*.o
+build/
+
+# Catálogos grandes gerados para benchmark
+data/grande*.csv
+
+# Editores e sistema
+.vscode/
+.idea/
+.DS_Store
