@@ -1,6 +1,14 @@
+/* main.c
+ *
+ * Interface de linha de comando do ranking: le o catalogo em CSV,
+ * escolhe o comparador pelo criterio e pela ordem, ordena com Quick Sort
+ * e exibe os primeiros produtos.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <limits.h>
 #include "produto.h"
 #include "comparadores.h"
 #include "quicksort.h"
@@ -53,6 +61,19 @@ static Comparador escolher_comparador(const char *criterio, const char *ordem) {
     return NULL;
 }
 
+/* Converte o texto para um inteiro >= 0. Retorna 1 se deu certo, 0 se o
+   texto nao for um numero valido (ex.: "abc", "5x", "-3"). */
+static int ler_quantidade(const char *texto, int *quantidade) {
+    char *fim;
+    errno = 0;
+    long valor = strtol(texto, &fim, 10);
+    if (fim == texto || *fim != '\0' || errno == ERANGE || valor < 0 || valor > INT_MAX) {
+        return 0;
+    }
+    *quantidade = (int)valor;
+    return 1;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 4 || argc > 5) {
         imprimir_uso(argv[0]);
@@ -62,7 +83,11 @@ int main(int argc, char *argv[]) {
     const char *arquivo  = argv[1];
     const char *criterio = argv[2];
     const char *ordem    = argv[3];
-    int quantidade = (argc == 5) ? atoi(argv[4]) : QUANTIDADE_PADRAO;
+    int quantidade = QUANTIDADE_PADRAO;
+    if (argc == 5 && !ler_quantidade(argv[4], &quantidade)) {
+        fprintf(stderr, "Erro: quantidade '%s' invalida (use um inteiro >= 0)\n", argv[4]);
+        return 1;
+    }
 
     Comparador cmp = escolher_comparador(criterio, ordem);
     if (cmp == NULL) {
