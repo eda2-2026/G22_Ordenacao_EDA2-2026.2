@@ -1,3 +1,8 @@
+/* csv.c
+ *
+ * Leitura do catalogo de produtos a partir de um arquivo CSV, com vetor
+ * dinamico (malloc/realloc) e descarte de linhas invalidas com aviso.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,6 +45,17 @@ Produto *ler_csv(const char *caminho, int *n) {
 
     while (fgets(linha, sizeof linha, arq) != NULL) {
         num_linha++;
+
+        /* Linha maior que o buffer: descarta o resto dela para nao
+           interpretar o pedaco que sobrou como uma linha nova. */
+        if (strchr(linha, '\n') == NULL && !feof(arq)) {
+            int c;
+            while ((c = fgetc(arq)) != '\n' && c != EOF) { }
+            fprintf(stderr, "Aviso: linha %d ignorada (maior que %d caracteres)\n",
+                    num_linha, TAM_LINHA - 1);
+            continue;
+        }
+
         remover_quebra(linha);
         if (linha[0] == '\0') {
             continue;  /* pula linhas em branco */
@@ -60,11 +76,17 @@ Produto *ler_csv(const char *caminho, int *n) {
         }
 
         Produto p;
-        /* %99[^,] lê o nome até a próxima vírgula (máx. 99 caracteres + '\0'). */
-        int lidos = sscanf(linha, "%d,%99[^,],%f,%f,%d",
-                           &p.id, p.nome, &p.preco, &p.avaliacao, &p.vendas);
-        if (lidos != 5) {
+        int fim = 0;
+        /* %99[^,] lê o nome até a próxima vírgula (máx. 99 caracteres + '\0').
+           %n guarda onde a leitura parou, para detectar campos sobrando. */
+        int lidos = sscanf(linha, "%d,%99[^,],%f,%f,%d%n",
+                           &p.id, p.nome, &p.preco, &p.avaliacao, &p.vendas, &fim);
+        if (lidos != 5 || linha[fim] != '\0') {
             fprintf(stderr, "Aviso: linha %d ignorada (formato invalido)\n", num_linha);
+            continue;
+        }
+        if (p.preco < 0 || p.avaliacao < 0 || p.avaliacao > 5 || p.vendas < 0) {
+            fprintf(stderr, "Aviso: linha %d ignorada (valor fora do intervalo)\n", num_linha);
             continue;
         }
 
