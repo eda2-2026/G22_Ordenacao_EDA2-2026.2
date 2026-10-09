@@ -99,13 +99,46 @@ id,nome,preco,avaliacao,vendas
 
 ## 5. Desempenho (Quick Sort × Bubble Sort × qsort)
 
-*(a preencher — Dia 6; média de 3 execuções)*
+Medições feitas com `tools/benchmark.c`, ordenando por **preço crescente**, com
+produtos gerados aleatoriamente na memória. Cada valor é a **média de 3 execuções**
+sobre catálogos diferentes. Antes de medir, o benchmark confere que os três
+algoritmos produzem exatamente a mesma ordem final (mesmo critério, com desempate
+por `id`).
 
 | n | Bubble Sort | Quick Sort | qsort (libc) |
 | --- | --- | --- | --- |
-| 1.000 | | | |
-| 10.000 | | | |
-| 100.000 | | | |
+| 1.000 | 9,3 ms | 0,42 ms | 0,38 ms |
+| 10.000 | 973 ms | 5,3 ms | 3,6 ms |
+| 100.000 | ≈ 532.000 ms (≈ 8,9 min) † | 34,7 ms | 40,7 ms |
+
+![Comparativo dos três algoritmos](docs/benchmark_comparativo.png)
+
+A 100.000 elementos o **Quick Sort é cerca de 15.000× mais rápido** que o Bubble
+Sort (≈ 35 ms contra ≈ 8,9 minutos). É o retrato da diferença entre **O(n log n)**
+e **O(n²)**: ao multiplicar `n` por 10, o Quick Sort cresce pouco mais que
+proporcionalmente, enquanto o Bubble Sort cresce ~100× (de 1k para 10k) e, de 10k
+para 100k, ainda mais. O nosso Quick Sort (pivô mediana-de-três) fica lado a lado
+com o `qsort` da biblioteca padrão, o que indica que a implementação está num
+patamar competitivo.
+
+### Efeito de cache: por que medir Bubble Sort a 100k precisa de cuidado
+
+Medir o Bubble Sort diretamente em 100.000 elementos leva **minutos de CPU a 100%**
+(numa execução direta deu ≈ 532.000 ms em uma das nossas máquinas). Nos tamanhos pequenos (até
+16k), porém, cada ordenação dura no máximo ~1s e segue um **O(n²) limpo**: ajustando
+`t = k·n²` aos pontos medidos obtém-se `k ≈ 9,7×10⁻⁶ ms`.
+
+O detalhe interessante é que essa extrapolação **subestima** o tempo real em 100k:
+ela prevê ≈ 97.000 ms, mas a medição direta deu ≈ 532.000 ms — **~5,5× mais**. O
+motivo é a **hierarquia de memória**: até 16k o vetor de produtos (≈ 1,8 MB) cabe
+na cache do processador; a 100k ele tem ≈ 11,6 MB, estoura a cache e cada acesso
+passa a buscar dados na RAM. O Bubble Sort, que varre o vetor repetidamente, é
+penalizado fortemente — por isso o tempo real descola da curva O(n²) teórica.
+
+![Efeito de cache na extrapolação](docs/benchmark_cache.png)
+
+*† valor medido diretamente. A extrapolação O(n²) a partir dos tamanhos que cabem
+na cache preveria ≈ 97.000 ms; a diferença vem do efeito de cache descrito acima.*
 
 ## 6. Divisão de trabalho
 
