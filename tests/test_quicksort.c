@@ -1,14 +1,3 @@
-/* tests/test_quicksort.c
- *
- * Testes formais de casos de borda do Quick Sort generico (Dia 4).
- *
- * Alem de verificar que o resultado fica ordenado segundo o comparador,
- * cobre explicitamente as entradas adversarias que o pivo mediana-de-tres
- * resolve: vetor JA ORDENADO e vetor INVERTIDO. Com o pivo fixo no ultimo
- * elemento esses casos degradariam para O(n^2) e, no vetor grande, a
- * recursao chegaria a ~N niveis de profundidade (risco de estouro de
- * pilha); com a mediana-de-tres as particoes ficam balanceadas.
- */
 #include "quicksort.h"
 #include "comparadores.h"
 #include <stdio.h>
@@ -22,15 +11,12 @@ static void checa(const char *nome, int cond) {
     else      {             printf("  [FALHOU] %s\n", nome); }
 }
 
-/* Verifica que v esta em ordem nao-decrescente segundo cmp. */
 static int esta_ordenado(const Produto *v, int n, Comparador cmp) {
     for (int i = 1; i < n; i++)
         if (cmp(&v[i - 1], &v[i]) > 0) return 0;
     return 1;
 }
 
-/* Soma dos ids: usada como "impressao digital" do conteudo para garantir
-   que ordenar e uma permutacao (nao perde nem duplica elementos). */
 static long soma_ids(const Produto *v, int n) {
     long s = 0;
     for (int i = 0; i < n; i++) s += v[i].id;
@@ -50,32 +36,27 @@ static Produto prod(int id, float preco) {
 int main(void) {
     printf("== Testes de borda do Quick Sort generico (Dia 4) ==\n");
 
-    /* 1. Ponteiro NULL nao deve quebrar (so retorna). */
     quicksort(NULL, 10, cmp_preco_asc);
     checa("ponteiro NULL nao quebra", 1);
 
-    /* 2. Comparador NULL nao deve quebrar. */
     {
         Produto v[3] = { prod(1, 3.0f), prod(2, 1.0f), prod(3, 2.0f) };
         quicksort(v, 3, NULL);
         checa("comparador NULL nao quebra", 1);
     }
 
-    /* 3. Vetor vazio (n = 0). */
     {
         Produto *v = NULL;
         quicksort(v, 0, cmp_preco_asc);
         checa("vetor vazio (n=0)", 1);
     }
 
-    /* 4. Um unico elemento. */
     {
         Produto v[1] = { prod(1, 9.9f) };
         quicksort(v, 1, cmp_preco_asc);
         checa("um elemento", esta_ordenado(v, 1, cmp_preco_asc));
     }
 
-    /* 5. Dois elementos fora de ordem. */
     {
         Produto v[2] = { prod(1, 5.0f), prod(2, 1.0f) };
         quicksort(v, 2, cmp_preco_asc);
@@ -83,7 +64,6 @@ int main(void) {
                                 && v[0].preco == 1.0f);
     }
 
-    /* 6. Ja ordenado crescente (adversario do pivo fixo). */
     {
         int n = 1000;
         Produto *v = malloc(n * sizeof(Produto));
@@ -95,7 +75,6 @@ int main(void) {
         free(v);
     }
 
-    /* 7. Ordem inversa / decrescente (adversario do pivo fixo). */
     {
         int n = 1000;
         Produto *v = malloc(n * sizeof(Produto));
@@ -107,7 +86,6 @@ int main(void) {
         free(v);
     }
 
-    /* 8. Todos com o mesmo preco: desempate deve ordenar por id crescente. */
     {
         Produto v[5] = {
             prod(50, 7.0f), prod(10, 7.0f), prod(30, 7.0f),
@@ -119,7 +97,6 @@ int main(void) {
         checa("precos iguais -> desempate por id crescente", ids_ok);
     }
 
-    /* 9. Precos repetidos e negativos misturados. */
     {
         float precos[] = { -3.0f, 2.5f, -3.0f, 0.0f, 2.5f, -10.0f, 0.0f };
         int n = (int)(sizeof(precos) / sizeof(precos[0]));
@@ -131,7 +108,6 @@ int main(void) {
         free(v);
     }
 
-    /* 10. Vetor grande aleatorio: ordena e continua sendo permutacao. */
     {
         int n = 10000;
         Produto *v = malloc(n * sizeof(Produto));

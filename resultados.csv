@@ -1,0 +1,14 @@
+n,algoritmo,ms,tipo
+1000,bubble,9.256,medido
+2000,bubble,38.000,medido
+4000,bubble,138.667,medido
+8000,bubble,595.667,medido
+10000,bubble,972.667,medido
+16000,bubble,2483.333,medido
+1000,quick,0.424,medido
+1000,qsort,0.384,medido
+10000,quick,5.333,medido
+10000,qsort,3.603,medido
+100000,bubble,96802.777,estimado
+100000,quick,34.667,medido
+100000,qsort,40.667,medido

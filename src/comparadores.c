@@ -1,9 +1,6 @@
 #include "comparadores.h"
 #include <string.h>
 
-/* Desempate por id. Em ordem crescente (asc) o desempate tambem e
-   crescente; em ordem decrescente (desc) ele e invertido, para o
-   ranking ficar consistente com o sentido do criterio principal. */
 static int desempate_id(const Produto *a, const Produto *b) {
     if (a->id < b->id) return -1;
     if (a->id > b->id) return 1;
