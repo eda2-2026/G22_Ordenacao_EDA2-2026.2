@@ -1,9 +1,3 @@
-/* main.c
- *
- * Interface de linha de comando do ranking: le o catalogo em CSV,
- * escolhe o comparador pelo criterio e pela ordem, ordena com Quick Sort
- * e exibe os primeiros produtos.
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +10,6 @@
 
 #define QUANTIDADE_PADRAO 10
 
-/* Associa o nome do critério digitado aos comparadores crescente e decrescente. */
 typedef struct {
     const char *nome;
     Comparador  asc;
@@ -39,7 +32,6 @@ static void imprimir_uso(const char *programa) {
     printf("Exemplo: %s data/produtos.csv preco asc 5\n", programa);
 }
 
-/* Devolve o comparador para o critério e a ordem, ou NULL se forem inválidos. */
 static Comparador escolher_comparador(const char *criterio, const char *ordem) {
     int crescente;
     if (strcmp(ordem, "asc") == 0) {
@@ -61,8 +53,6 @@ static Comparador escolher_comparador(const char *criterio, const char *ordem) {
     return NULL;
 }
 
-/* Converte o texto para um inteiro >= 0. Retorna 1 se deu certo, 0 se o
-   texto nao for um numero valido (ex.: "abc", "5x", "-3"). */
 static int ler_quantidade(const char *texto, int *quantidade) {
     char *fim;
     errno = 0;

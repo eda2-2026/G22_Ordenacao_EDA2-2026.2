@@ -1,7 +1,3 @@
-/* produto.c
- *
- * Exibicao de produtos em formato de tabela no terminal.
- */
 #include <stdio.h>
 #include "produto.h"
 

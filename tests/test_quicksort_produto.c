@@ -16,7 +16,6 @@ static Produto novo(int id, const char *nome, float preco, float aval, int venda
     return p;
 }
 
-/* Ordena com cmp e confere que o resultado respeita o proprio cmp. */
 static void checa(const char *rotulo, const Produto *base, int n, Comparador cmp) {
     total++;
     Produto v[16];
@@ -54,7 +53,6 @@ int main(void) {
     checa("nome asc",       base, n, cmp_nome_asc);
     checa("nome desc",      base, n, cmp_nome_desc);
 
-    /* desempate por id: ids 1,2,6 tem avaliacao 4.5 -> devem sair 1,2,6 */
     total++;
     Produto v[6];
     memcpy(v, base, sizeof base);
